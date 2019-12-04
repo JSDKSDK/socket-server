@@ -1,4 +1,6 @@
 import { Router,Request,Response, response } from 'express';
+import Server from '../Clases/Server';
+
 
 const router = Router();
 
@@ -11,6 +13,13 @@ router.get('/mensajes', (req:Request,res:Response)=>{
 router.post('/mensajes', (req:Request,res:Response)=>{
     const cuerpo=req.body.cuerpo;
     const de=req.body.de;
+    const server=Server.instance;
+    const payload={
+        de,
+        cuerpo
+    }
+    server.io.emit('mensaje-nuevo',payload)// manda a todos los usuarios 
+    
     res.json({
         ok:true,
         cuerpo,
@@ -21,6 +30,14 @@ router.post('/mensajes/:id', (req:Request,res:Response)=>{
     const cuerpo=req.body.cuerpo;
     const de=req.body.de;
     const id=req.params.id;
+    
+    const payload={
+        de,
+        cuerpo
+    }
+    const server=Server.instance;
+    server.io.in(id).emit('mensaje-privado',payload);
+
     res.json({
         ok:true,
         cuerpo,
